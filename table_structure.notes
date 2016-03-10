@@ -1,0 +1,89 @@
+  clients table
+	clientid
+	business name
+	contact email
+	contact fname
+	contact lname
+	contact phone 1
+	contact phone 2
+	contact address1
+	contact address2
+	contact city
+	contact state
+	contact postalcode
+	contact website url
+	contact dev site url
+
+
+credentials table
+	credential id
+	credential_typeid
+	client_id
+
+	login url
+	login username
+	login password
+	login pin #
+	login status (can flag as outdated/wrong)
+	last_modified_by
+	last_modified_date
+
+notes table
+	note id
+	note user id
+	note credential id
+	note client id
+	note
+	
+credential type table
+	credential_typeid
+	worpdress login
+	hostingtypeid
+	dns login
+	authorize.net credential
+	other credential
+
+
+
+hosting type table
+	hostingtypeid
+	561windows hosting
+	561 linux hosting
+	external hosting
+
+
+
+employees table
+	employee id
+	employee fname
+	employee lname
+	username
+	password
+	lastlogin
+	email
+	authcode
+	authtime
+	status (so they can be deactived)
+	access level (access level id from access level table)
+
+access level table
+	id
+	description
+		(1 = view, 2 = edit, 3 = delete, 4 employee, 5 admin, 6 superadmin )
+
+
+
+employee access table (serialized)
+	employeeid
+	accessdata (list of credential ids from credentials table where they have access to or clients)
+		array(credentials=>array(credential_id,access_level), clients=>array(clientid, access_level))
+
+
+access log table
+	id
+	client_id
+	employeeid
+	timeaccessed
+	action taken (view, edit, delete)
+
+

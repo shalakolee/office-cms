@@ -1,0 +1,40 @@
+#settingsDropdown:hover{
+	color:#337ab7;
+}
+
+/* CLIENT PAGE */
+.edit_button {
+	float: right;
+	cursor: pointer;
+}
+.name {
+	font-weight: bold;
+}
+.removeclient, .remove_cred_line, .removecredential, .remove_edit_cred {
+	color:#ff0000;
+	cursor:pointer;
+}
+.client-container{
+	margin-bottom:20px;
+}
+thead tr th form.add_client {
+	padding-bottom: 20px;
+}
+#fa_username.fa-close{
+	color:#ff0000;
+}
+#fa_username.fa-check{
+	color:green;
+}
+.add_client_credential tr td,
+.credential_list tr td {
+	vertical-align: middle !important;
+}
+td.del {
+	text-align: center;
+}
+tbody tr td {
+	vertical-align: middle !important;
+}
+tr.clientTR:not(.active):hover {background-color:#337ab7 !important;color:#fff !important;}
+.name{width:100%;display:block;cursor:pointer;}
