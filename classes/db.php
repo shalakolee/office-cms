@@ -45,7 +45,7 @@ class db{
 		 */
 		global $_SETTINGS;
 		
-		$this->db = new PDO('mysql:host='.$_SETTINGS['dbHost'].';dbname='.$_SETTINGS['dbName'].';charset=utf8mb4', $_SETTINGS['dbUser'], $_SETTINGS['dbPass']);
+		$this->db = new PDO('mysql:host='.$_SETTINGS['dbHost'].';dbname='.$_SETTINGS['dbName'].';charset=utf8', $_SETTINGS['dbUser'], $_SETTINGS['dbPass']);
 		$this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		$this->db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
 	}

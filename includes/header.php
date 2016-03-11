@@ -19,6 +19,7 @@ require_once("includes/ajax_handler.php");
 <script src="js/chosen/chosen.jquery.min.js"></script>
 <script src="js/bootstrap/js/bootstrap.min.js"></script>
 <script src="js/fancybox/jquery.fancybox.js"></script>
+<!-- <script src="js/list-pagination.js"></script> -->
 <script src="js/list.js"></script>
 <script src="js/copy.js"></script> 
 

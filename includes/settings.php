@@ -1,4 +1,4 @@
-﻿<?php 
+<?php 
 /*
 coded by:
 ¦¦¦¦¦¦¦¦_   _¦     _¦¦¦¦¦¦_     _¦¦¦¦¦¦_   _¦          _¦¦¦¦¦¦¦¦ 
@@ -24,9 +24,9 @@ and:
  * Database Settings
  * - settings for the database setup throughout the site (front end and back end)
  */
-$_SETTINGS['dbHost']	= '';
-$_SETTINGS['dbName']	= '';
-$_SETTINGS['dbUser']	= '';
-$_SETTINGS['dbPass']	= '';
+$_SETTINGS['dbHost']	= 'localhost';
+$_SETTINGS['dbName']	= 'z15_application';
+$_SETTINGS['dbUser']	= 'root';
+$_SETTINGS['dbPass']	= 'Dev2013guy##';
  
  ?>

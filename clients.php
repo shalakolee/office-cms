@@ -17,11 +17,11 @@
 		 */
 
 		if($_SESSION['session']->user->isMasterAdmin):
-			$sql = 'SELECT * FROM clients';
+			$sql = 'SELECT * FROM clients ORDER BY name asc';
 		else:
 			$sql = 'SELECT cl.* FROM employee_access ea 
 					LEFT JOIN clients cl ON cl.id = ea.client_id 
-					WHERE ea.employee_id = "'. $_SESSION['session']->user->id . '" AND ea.client_id != "";';
+					WHERE ea.employee_id = "'. $_SESSION['session']->user->id . '" AND ea.client_id != "" ORDER BY name asc;';
 		endif;
 
 
@@ -200,9 +200,9 @@
 										<div class="panel-body">
 											<div class="formRow">
 												<div>
-													<span class="name contact_fname-<?=$client->id;?>"><?=ucwords($client->contact_fname);?></span> 
+													<span class=" contact_fname-<?=$client->id;?>"><?=ucwords($client->contact_fname);?></span> 
 												
-													<span class="name contact_lname-<?=$client->id;?>"><?=ucwords($client->contact_lname);?></span>
+													<span class=" contact_lname-<?=$client->id;?>"><?=ucwords($client->contact_lname);?></span>
 												</div>
 												
 												<div><span class="contact_address_1-<?=$client->id;?>"><?=ucwords($client->contact_address_1);?></span></div>
@@ -347,13 +347,16 @@
 									endforeach;
 								?>
 								</tbody>
+								<tfoot>
 								<?php if($_SESSION['session']->user->isAdmin == true): ?>
 								<tr>
 									<td colspan="10" style="text-align: right;">
+										<button class="btn btn-default generateguid" href="#generateGUID">Generate GUID</button>
 										<a class="btn btn-primary add_edit_cred" client="<?=$client->id;?>">Add New Credential</a>
 									</td>
 								</tr>
 								<?php endif; ?>
+								</tfoot>
 							</table>
 							</div>
 						</td>
@@ -361,6 +364,40 @@
 				<?php endforeach; ?>
 			</tbody>
 		</table>
+		</div>
+		<?php //fancybox for the generate guid button ?>
+		<div id="generateGUID" style="display:none;">
+			<div class="panel panel-default">
+				<div class="panel-heading">Generate GUID</div>
+				<div class="panel-body">
+					<?php //generate the initial password here then make a new generate button ?>
+						<div class="input-group">
+			 				<span class="input-group-addon" id="_getguid">
+			 					<copy-button class='copy_guid' title="Copy">
+			 					<i class='fa fa-copy'></i>
+			 					</copy-button> 
+			 					<span class='copytxt guidtext' style="display:none;" >
+			 					<?php //this is here so we have the copy button ?>
+			 					<?php $ranGuid = generateGuid(); ?>
+			 					<?php echo $ranGuid; ?>
+			 					</span>
+		 					</span>
+			 				 <input type="text" class="form-control" placeholder="" aria-describedby="_getguid" name="getguid" id="getguid" value="<?php echo $ranGuid; ?>">
+						      <span class="input-group-btn">
+							      <button class="btn btn-default" type="button" id="btnGenerateGuid">Generate</button>
+						      </span>
+						</div>
+						<div style="height:20px;"></div>
+						<div>
+							<div style="margin-top:20px;">
+								<button class="btn btn-default" type="button" id="btnUse" style="float:right;">Close</button>
+							</div>
+							<div style="clear:both;"></div>
+						</div>
+
+						<div style="clear:both;"></div>
+				</div>
+			</div>
 		</div>
 
 
@@ -375,7 +412,28 @@
  		var notesobj = {};
  		var name = '<?= $_SESSION['session']->user->firstname . ' ' . $_SESSION['session']->user->lastname ?>';
  		var array = ['contact_fname', 'contact_lname', 'contact_address_1', 'contact_address_2', 'contact_city', 'contact_state', 'contact_postalcode', 'contact_phone_1', 'contact_phone_2', 'contact_email', 'url', 'devurl'];
- 		
+
+		$(".generateguid").fancybox({maxWidth:350});
+
+ 		//generate guid from fancybox
+		$("#btnGenerateGuid").click(function(){
+			$.ajax({
+				url:'clients.php',
+				type: "POST",
+				data:{doingajax:"true", ajax_function: "generate_guid"},
+				success:function(response){
+					//replace the data
+					$("#getguid").val(response);
+					$('.guidtext').text(response);
+					getCopyButtons();
+				}
+			});
+		});
+		//close the fancybox
+		$("#btnUse").click(function(){
+			//$(passwordTarget).val($("#getpassword").val());
+			$.fancybox.close(true);
+		});
 
  		// add new stuff
  		$('.save_add_credential').click(function(e){
@@ -712,21 +770,35 @@
 			var label = $(cred_line + ' td.c_label input[type="hidden"]').val();
 			var link = $(cred_line + ' td.url input[type="hidden"]').val();
 			var username = $(cred_line + ' td.username input[type="hidden"]').val();
-			var password = $(cred_line + ' td.password input[type="hidden"]').val();
 			var guid = $(cred_line + ' td.guid input[type="hidden"]').val();
 			var pin = $(cred_line + ' td.pin input[type="hidden"]').val();
 			var notes = $(cred_line + ' td.notes').html();
 			notesobj[cred_line_number] = notes;
+			
+			//have to pull the password with ajax here (because the input box will have nothing in it )
+			var password = $(cred_line + ' td.password input[type="hidden"]').val();
+			$.ajax({
+				url:'clients.php',
+				type: "POST",
+				data: {doingajax: "true", ajax_function: "view_credential", credential_id: credential},
+				success:function(response){
+					password = response;
+					$(cred_line + ' td.del').html('<i class="remove_edit_cred fa fa-minus" cred-line="' + cred_line_number + '" credential-id="' + credential + '"></i>');
+					$(cred_line + ' td.c_label').html('<input type="text" class="form-control" placeholder="Label" name="credential[' + credential + '][label]" value="' + label + '"><input type="hidden" value="' + label + '">');
+					$(cred_line + ' td.url').html('<input type="text" class="form-control" placeholder="Link" name="credential[' + credential + '][link]" value="' + link + '"><input type="hidden" value="' + link + '">');
+					$(cred_line + ' td.username').html('<input type="text" class="form-control" placeholder="Username" name="credential[' + credential + '][username]" value="' + username + '"><input type="hidden" value="' + username + '">');
+					$(cred_line + ' td.password').html('<input type="password" class="form-control" placeholder="Password" name="credential[' + credential + '][password]" value="' + password + '"><input type="hidden" value="' + password + '">');
+					$(cred_line + ' td.guid').html('<input type="text" class="form-control" placeholder="GUID" name="credential[' + credential + '][guid]" value="' + guid + '"><input type="hidden" value="' + guid + '">');
+					$(cred_line + ' td.pin').html('<input type="text" class="form-control" placeholder="PIN" name="credential[' + credential + '][pin]" value="' + pin + '"><input type="hidden" value="' + pin + '">');
+					$(cred_line + ' td.notes').html('<a class="btn btn-default btn-sm cred_edit_cancel" cred-line="' + cred_line_number + '" credential-id="' + credential + '">Cancel</a>');
+					$(cred_line + ' td.action').html('<a class="btn btn-primary btn-sm cred_edit_save" cred-line="' + cred_line_number + '">Save</a>');
+					
+				}
 
-			$(cred_line + ' td.del').html('<i class="remove_edit_cred fa fa-minus" cred-line="' + cred_line_number + '" credential-id="' + credential + '"></i>');
-			$(cred_line + ' td.c_label').html('<input type="text" class="form-control" placeholder="Label" name="credential[' + credential + '][label]" value="' + label + '"><input type="hidden" value="' + label + '">');
-			$(cred_line + ' td.url').html('<input type="text" class="form-control" placeholder="Link" name="credential[' + credential + '][link]" value="' + link + '"><input type="hidden" value="' + link + '">');
-			$(cred_line + ' td.username').html('<input type="text" class="form-control" placeholder="Username" name="credential[' + credential + '][username]" value="' + username + '"><input type="hidden" value="' + username + '">');
-			$(cred_line + ' td.password').html('<input type="password" class="form-control" placeholder="Password" name="credential[' + credential + '][password]" value="' + password + '"><input type="hidden" value="' + password + '">');
-			$(cred_line + ' td.guid').html('<input type="text" class="form-control" placeholder="GUID" name="credential[' + credential + '][guid]" value="' + guid + '"><input type="hidden" value="' + guid + '">');
-			$(cred_line + ' td.pin').html('<input type="text" class="form-control" placeholder="PIN" name="credential[' + credential + '][pin]" value="' + pin + '"><input type="hidden" value="' + pin + '">');
-			$(cred_line + ' td.notes').html('<a class="btn btn-default btn-sm cred_edit_cancel" cred-line="' + cred_line_number + '" credential-id="' + credential + '">Cancel</a>');
-			$(cred_line + ' td.action').html('<a class="btn btn-primary btn-sm cred_edit_save" cred-line="' + cred_line_number + '">Save</a>');
+			});
+
+
+
 		});
 
 
@@ -740,7 +812,10 @@
 			var label = $(cred_line + ' td.c_label input[type="hidden"]').val();
 			var link = $(cred_line + ' td.url input[type="hidden"]').val();
 			var username = $(cred_line + ' td.username input[type="hidden"]').val();
-			var password = $(cred_line + ' td.password input[type="hidden"]').val();
+			// having this here will bypass the need to click view if inspecting the element
+			//var password = $(cred_line + ' td.password input[type="hidden"]').val();
+			//FIX:
+			var password = '';
 			var guid = $(cred_line + ' td.guid input[type="hidden"]').val();
 			var pin = $(cred_line + ' td.pin input[type="hidden"]').val();
 			var notes = $(cred_line + ' td.notes input[type="hidden"]').val();
@@ -846,7 +921,7 @@
 		$("[rel=popover]").popover({'trigger':'hover', 'html':true});
 		$(".cred_notes").fancybox({maxWidth:500, maxHeight: 700});
  		/* list.js filtering*/
-		var clientList = new List('clients', {valueNames: [ 'name']});
+		var clientList = new List('clients', {valueNames: [ 'name'], page:5000});
 
 
 		/* handle the caret click*/
@@ -967,6 +1042,7 @@
  	    function getCopyButtons(){
     	var i = 0;
     	var e = 0;
+    	var ie = 0;
     	$(".copy_username").each(function(){
     		var copytxt = "#" + $(this).parent('td').find('.copytxt').attr("id", "copyUsername"+i).attr("id");
     		$(this).attr("target-element", copytxt);
@@ -976,6 +1052,11 @@
     		var copytxt = "#" + $(this).parent('div').find('.copytxt').attr("id", "copyPassword"+e).attr("id");
     		$(this).attr("target-element", copytxt);
     		e++;
+    	});
+    	$(".copy_guid").each(function(){
+    		var copytxt = "#" + $(this).parent('span').find('.copytxt').attr("id", "copyGuid"+ie).attr("id");
+    		$(this).attr("target-element", copytxt);
+    		ie++;
     	});
 
     }

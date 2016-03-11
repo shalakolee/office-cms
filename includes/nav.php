@@ -23,7 +23,22 @@
 	</li>
 	<li role="presentation">
 		<a class="nav-container" data-toggle="collapse" href="#toolsNav">Tools<span class="caret-container"><span class="caret arrow"></span></span></a>
-          <ul class="nav nav-pills nav-stacked collapse <?php echo $script_name == "tool_passgen.php" ? 'in' : ""  ?>" id="toolsNav">
+
+		<?php 
+
+			$navactive = false;
+			$toolarray = array(
+				'tool_passgen.php',
+				'tool_plugin.php',
+				);
+			if(in_array($script_name, $toolarray)){
+				$navactive = true;
+			}
+		 ?>		
+
+
+          <ul class="nav nav-pills nav-stacked collapse <?php echo $navactive ? 'in' : ""  ?>" id="toolsNav">
+            <li <?php echo $script_name == "tool_plugin.php" ? 'class="active"' : ""  ?>><a href="tool_plugin.php">Wordpress Password Control Plugin</a></li>
             <li <?php echo $script_name == "tool_passgen.php" ? 'class="active"' : ""  ?>><a href="tool_passgen.php">Strong Password Generator</a></li>
             <li><a href="#">Serialize/Unserialize</a></li>
             <li class="nav-divider"></li>

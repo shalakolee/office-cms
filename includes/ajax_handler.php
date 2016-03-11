@@ -7,6 +7,9 @@ if(isset($_POST['doingajax'])):
 		case "generate_password":
 			echo generateRandomPassword();
 			break;
+		case "generate_guid":
+			echo generateGuid();
+			break;			
 		case "get_client_credentials":
 			//if getting client credentials we need a client_id
 			$sql = 'select c.id as id, ct.type as type, c.label as label from credential c left join credential_types ct on c.type_id = ct.id where c.client_id= ?';
@@ -195,7 +198,7 @@ if(isset($_POST['doingajax'])):
 			$sql = 'INSERT INTO clients (name, contact_fname, contact_lname, contact_email, contact_phone_1, contact_phone_2, contact_address_1, contact_address_2, contact_city, contact_state, contact_postalcode, url, devurl) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?);';
 			$new_client = $db->insert($sql, $_POST['name'], $_POST['fname'], $_POST['lname'], $_POST['email'], $_POST['phone1'], $_POST['phone2'], $_POST['address1'], $_POST['address2'], $_POST['city'], $_POST['state'], $_POST['postalcode'], $_POST['url'], $_POST['devurl']);
 			foreach($_POST['credential'] as $key => $value):
-				$sql = 'INSERT INTO credential(client_id, type_id, label, url, username, password, guid, pin, date_modified, modified_by, status) VALUES (?,?,?,?,?,?,?,?,?,?);';
+				$sql = 'INSERT INTO credential(client_id, type_id, label, url, username, password, guid, pin, date_modified, modified_by, status) VALUES (?,?,?,?,?,?,?,?,?,?,?);';
 				$credential = $db->insert($sql, $new_client, $value['type'], $value['label'], $value['url'], $value['username'], $value['password'], $value['guid'], $value['pin'], date("Y-m-d H:i:s"), $_SESSION['session']->user->id, 'active');
 				if($value['note']):
 					foreach($value['note'] as $key=>$note):
@@ -257,7 +260,7 @@ if(isset($_POST['doingajax'])):
 			unset($_POST['doingajax']);
 			unset($_POST['ajax_function']);
 			unset($_POST['client']);
-			$sql = 'INSERT INTO credential(client_id, type_id, label, url, username, password, guid, pin, date_modified, modified_by, status) VALUES (?,?,?,?,?,?,?,?,?,?);';
+			$sql = 'INSERT INTO credential(client_id, type_id, label, url, username, password, guid, pin, date_modified, modified_by, status) VALUES (?,?,?,?,?,?,?,?,?,?, ?);';
 			$credential = $db->insert($sql, $client_id, $_POST['type_id'], $_POST['label'], $_POST['url'], $_POST['username'], $_POST['password'], $_POST['guid'], $_POST['pin'], date("Y-m-d H:i:s"), $_SESSION['session']->user->id, 'active');
 			if($_POST['notes']):
 				foreach($_POST['notes'] as $key=>$value):

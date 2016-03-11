@@ -38,3 +38,6 @@ tbody tr td {
 }
 tr.clientTR:not(.active):hover {background-color:#337ab7 !important;color:#fff !important;}
 .name{width:100%;display:block;cursor:pointer;}
+.logins {
+	height:auto;
+}

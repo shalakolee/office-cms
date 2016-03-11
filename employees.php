@@ -286,7 +286,7 @@ $v = 99999; //high number here so we never actually hit it
 																	<select data-placeholder="Choose a Client..." id="clientSelect_<?php echo $v; ?>" name="clients[<?php echo $v; ?>][client_id]" class="clientSelect" >
 																		<option></option>
 																		<?php foreach($clients as $client): ?>
-																			<option value="<?php echo $client->id; ?>" <?php echo $thisclient->client_id == $client->id ? "selected" : ""; ?> ><?php echo $client->name; ?></option>
+																			<option value="<?php echo $client->id; ?>" <?php echo $thisclient->client_id == $client->id ? "selected" : ""; ?> ><?php echo ($client->name); ?></option>
 																		<?php endforeach; ?>
 																	</select>
 																</td>
@@ -404,25 +404,25 @@ $v = 99999; //high number here so we never actually hit it
 		$(".btnAddCred").click(function(){
 			i++;
 
-			var myString = ''+
-				'<tr>' +
-				'	<td>' +
-				'		<i class="fa fa-minus removecredential"></i>' +
-				'	</td>' +
-				'	<td>' +
-				'		<select data-placeholder="Choose a Client..." id="clientSelect_'+i+'" name="clients['+i+'][client_id]" class="clientSelect" >' +
-				'			<option></option>' +
-				'			<?php foreach($clients as $client): ?>' +
-				'				<option value="<?php echo $client->id; ?>"><?php echo $client->name; ?></option>' +
-				'			<?php endforeach; ?>' +
-				'		</select>' +
-				'	</td>' +
-				'	<td>' +
-				'		<select data-placeholder="Choose Credentials..." id="credentialSelect_'+i+'" name="clients['+i+'][credentials][]" class="chosen" multiple style="display:none;float:right;">' +
-				'			<option></option>' +
-				'		</select>' +
-				'	</td>' +
-				'</tr>';
+			var myString = ""+
+				"<tr>" +
+				"	<td>" +
+				"		<i class='fa fa-minus removecredential'></i>" +
+				"	</td>" +
+				"	<td>" +
+				"		<select data-placeholder='Choose a Client...'' id='clientSelect_"+i+"' name='clients["+i+"][client_id]' class='clientSelect' >" +
+				"			<option></option>" +
+				"			<?php foreach($clients as $client): ?>" +
+				"				<option value='<?php echo $client->id; ?>'><?php echo $client->name; ?></option>" +
+				"			<?php endforeach; ?>" +
+				"		</select>" +
+				"	</td>" +
+				"	<td>" +
+				"		<select data-placeholder='Choose Credentials...' id='credentialSelect_"+i+"' name='clients["+i+"][credentials][]' class='chosen' multiple style='display:none;float:right;'>" +
+				"			<option></option>" +
+				"		</select>" +
+				"	</td>" +
+				"</tr";
 
 			$(myString).appendTo( $(this).closest('form').find(".credential_list") );
 
@@ -539,17 +539,12 @@ $v = 99999; //high number here so we never actually hit it
 	 				data:{doingajax:"true", ajax_function: "add_employee", data:formData},
 	 				success:function(response){
 	 					//replace the data
- 						$(".msgholder").append(response);
+ 						//$(".msgholder").append(response);
 	 					//console.log(response);
-	 					if(response == "success"){
-	 						//close and reset the form
-							$('#frmAddNew')[0].reset();
-							$('#frmAddNew').find(".credential_list").empty();
-							$("#addnew").slideToggle();			
-							$("#btnAddCred").fadeIn();
-							$("#btnAddNew").removeAttr("disabled");
-
+ 					 	if(response == "success"){
+	 					 	 location.reload();
 	 					}
+
 	 				}
 	 			});
  			}else{
