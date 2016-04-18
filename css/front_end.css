@@ -41,3 +41,6 @@ tr.clientTR:not(.active):hover {background-color:#337ab7 !important;color:#fff !
 .logins {
 	height:auto;
 }
+i.cred_notes{
+	font-size:19px;
+}

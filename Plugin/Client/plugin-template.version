@@ -1,7 +1,7 @@
 {
-    "name" : "561 Wordpress Password Control",
-    "slug" : "561-password-control",
-    "download_url" : "http://pwupdate.561media.com/561-password-control.zip",
+    "name" : "Custom Plugin Template",
+    "slug" : "plugin-template",
+    "download_url" : "http://pwupdate.561media.com/plugin-template.zip",
     "version" : "1.0.4",
     "author" : "Shalako Lee",
     "sections" : {

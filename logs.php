@@ -1,16 +1,13 @@
 <?php include_once("includes/header.php"); ?>
-<?php 
+<?php restrictedPage();
 	
 //echo generateGuid();
 
  ?>
 
+Logs
 
-Welcome to the 561 Media Credential CMS
-
-<br /><br />
-Please navigate using the left menu.
-
+<br /><br > 
 
 
 

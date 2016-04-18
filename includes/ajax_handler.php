@@ -189,8 +189,12 @@ if(isset($_POST['doingajax'])):
 			break;
 
 		case "check_username":
-			$sql = "select id from employees where username = ? ";
-			echo count( $db->query($sql, strtolower(trim($_POST['username']))) );
+			$sql = "select id from employees where username = lcase(?) ";
+			echo count( $db->query($sql, strtolower(trim($_POST['username']) ) ) );
+			break;
+		case "check_clientname":
+			$sql = "select id from clients where name = ?";
+			echo count(  $db->query($sql, strtolower(trim($_POST['clientname']))) );
 			break;
 		case "add_client":
 			unset($_POST['doingajax']);
@@ -301,6 +305,16 @@ if(isset($_POST['doingajax'])):
 		case "delete_credential":
 			$sql = 'DELETE FROM credential WHERE id = "' . $_POST['credential'] . '";';
 			$res = $db->query($sql);
+			break;
+		case "delete_client_note":
+			$sql = 'DELETE FROM notes WHERE note_id = "' . $_POST['note_id'] . '";';
+			$res = $db->query($sql);
+			break;
+		case "add_client_note":
+			$sql = 'INSERT INTO notes (employee_id, client_id, note, date_modified, modified_by, status) VALUES (?,?,?,?,?,?);';
+			$note = $db->insert($sql, $_SESSION['session']->user->id, $_POST['client'], $_POST['note'], date("Y-m-d H:i:s"), $_SESSION['session']->user->id, 'active');
+			echo json_encode(array('note_id'=>$note));
+			break;
 	}
 
 	die();

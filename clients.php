@@ -16,7 +16,7 @@
 		 * if we are a super admin, show ALL the clients
 		 */
 
-		if($_SESSION['session']->user->isMasterAdmin):
+		if($_SESSION['session']->user->isMasterAdmin ||$_SESSION['session']->user->isAdmin):
 			$sql = 'SELECT * FROM clients ORDER BY name asc';
 		else:
 			$sql = 'SELECT cl.* FROM employee_access ea 
@@ -46,6 +46,7 @@
 				 				<div class="input-group">
 					 				<span class="input-group-addon" id="client-name">Client Name</span>
 					 				<input type="text" class="form-control" placeholder="Client Name" aria-describedby="client-name" name="name" id="name">
+					 				<span class="input-group-addon" ><i class='fa' id='fa_clientname'></i></span>
 				 				</div>
 
 			 					<div style="height:20px;"></div>
@@ -163,7 +164,7 @@
 								<div style="height: 20px;"></div>
 
 								<a class="save_add_credential btn btn-primary" style="float: left;">Add Credential</a>
-								<a class="save_add_client btn btn-primary" style="float:right;">Save Client</a>
+								<button class="save_add_client btn btn-primary" style="float:right;">Save Client</button>
 								<a class="cancel-btn btn btn-default" style="float: right; margin-right: 6px;">Cancel</a>
 							</div>
 
@@ -230,21 +231,28 @@
 											<div style="height:20px;"></div>
 											<div class="formRow">
 												Notes:<br />
-												<?php 
-												//make sure we are only putting 5 notes into the notes tab 
-												//TODO: make this better;
-												$notesCount = count($clientNotes);
-													if($notesCount > 5 ):
-														$notesCount = 5;
-													endif;
-													$i=0;
-													
-												 ?>
-												<?php while($i < $notesCount): ?>
-													<?php echo $clientNotes[$i]->note ?>
-													<i class="fa fa-info-circle" rel="popover" title="<?php echo ucwords($clientNotes[$i]->fname ." " . $clientNotes[$i]->lname) ?>" data-content="<?php echo $clientNotes[$i]->date_modified ?>"></i>
-													<?php $i++ //now output all the notes and hide them until we click all above ?>
-												<?php endwhile; ?>
+												<i class="fa fa-comments client_notes" href="#clientnotes_<?php echo $client->id ?>" style="cursor:pointer;"></i>
+
+
+												<?php //putting a hidden div in here that we can load up with a floating box ?>
+												<div id="clientnotes_<?php echo $client->id ?>" style="width: 500px; height: 500px; display:none;">
+												<textarea id="client_new_comment-<?=$client->id; ?>" placeholder="Note" class="form-control"></textarea>
+												<div style="margin-top: 4px; text-align: right;">
+													<a class="btn btn-primary btn-sm add_client_note" client-id="<?=$client->id;?>">Add New Note</a>
+												</div>
+
+													<?php foreach($clientNotes as $clientNote): ?>
+														<div class="note" id="c_note_<?=$clientNote->note_id;?>" style="margin-bottom:20px;">
+															<div class="note-author"><?php echo ucwords($clientNote->fname . " " . $clientNote->lname); ?></div>
+															<div class="note-content" style="border:1px solid black;padding:10px; border-radius:5px;">
+																<?php echo $clientNote->note; ?>
+																<?php if($clientNote->employee_id == $_SESSION['session']->user->id || $_SESSION['session']->user->isAdmin == true): ?>
+																<button type="button" class="delete_client_note" note="<?=$clientNote->note_id;?>" style="float: right;">&times;</button>
+																<?php endif; ?>
+															</div>
+														</div>
+													<?php endforeach; ?>
+												</div>
 											</div>
 
 										</div>
@@ -277,7 +285,7 @@
 
 								<?php 
 									/* check if master admin */
-									if($_SESSION['session']->user->isMasterAdmin):
+									if($_SESSION['session']->user->isMasterAdmin || $_SESSION['session']->user->isAdmin):
 										$sql = 'SELECT c.id, ct.type as type, c.label, c.url, c.username, c.password, c.pin, c.guid FROM credential c LEFT JOIN credential_types ct on ct.id = c.type_id where client_id = '. $client->id;
 									else:
 										$sql = 'SELECT c.id, ct.type as type, c.label, c.url, c.username, c.password, c.pin, c.guid FROM employee_access ea LEFT JOIN credential c ON c.id = ea.credential_id LEFT JOIN credential_types ct ON ct.id = c.type_id WHERE ea.employee_id = "' . $_SESSION['session']->user->id . '" AND c.client_id = "' . $client->id . '" AND status = "active";';
@@ -313,7 +321,8 @@
 											<td class="notes">
 
 
-												<i class="fa fa-comments cred_notes" href="#crednotes_<?php echo $cred->id ?>" style="cursor:pointer;"></i>
+
+												<i class="fa fa-comments cred_notes" href="#crednotes_<?php echo $cred->id ?>" style="cursor:pointer;<?php echo $credNotes ? "color:#286090" : "" ?>"><?php echo $credNotes ? " <span class='badge' style='background-color:#286090;color:#fff;'>".count($credNotes)."</span>" : "" ?></i>
 
 
 												<?php //putting a hidden div in here that we can load up with a floating box ?>
@@ -405,6 +414,10 @@
 
  <script>
  	$(document).ready(function(){
+
+ 		$(".search").focus();
+
+
  		var i = 0; // new cred index
  		var n = 0; // new note index
  		var t = <?=$cred_edit_number;?>; // credential edit number to continue where we set off so no confusion on the dom
@@ -412,6 +425,57 @@
  		var notesobj = {};
  		var name = '<?= $_SESSION['session']->user->firstname . ' ' . $_SESSION['session']->user->lastname ?>';
  		var array = ['contact_fname', 'contact_lname', 'contact_address_1', 'contact_address_2', 'contact_city', 'contact_state', 'contact_postalcode', 'contact_phone_1', 'contact_phone_2', 'contact_email', 'url', 'devurl'];
+
+ 		// CLIENT NOTES
+		$(".client_notes").fancybox({maxWidth:500, maxHeight: 700});
+		
+		$('.add_client_note').click(function(e){
+			var client_id = $(this).attr('client-id');
+ 			var note = $('#client_new_comment-' + client_id).val();
+
+ 			console.log(note);
+ 			if(note){
+	 			e.preventDefault();
+				$.ajax({
+					url:'clients.php',
+					type: "POST",
+					data:{doingajax:"true", ajax_function: "add_client_note", client: client_id, note: note},
+					success:function(response){
+						//console.log(response);
+						var obj = JSON.parse(response);
+						var note_id = obj['note_id'];
+						var note_body = '<div class="note" id="c_note_' + note_id + '" style="margin-bottom:20px;">' +
+										'					<div class="note-author">' + name + '</div>' +
+										'					<div class="note-content" style="border:1px solid black;padding:10px; border-radius:5px;">' + 
+										note +
+										'						<button type="button" class="delete_client_note" note="' + note_id + '" style="float: right;">&times;</button>' +
+										'					</div>' +
+										'				</div>';
+						$('#clientnotes_' + client_id).append(note_body);
+					}
+				});
+	 			$('#client_new_comment-' + client_id).val('');
+	 		}
+		});
+		$('body').delegate('.delete_client_note', 'click', function(){
+			var note_id = $(this).attr('note');
+			var data = {};
+			var what = confirm('Are You Sure?');
+			data['doingajax'] = 'true';
+			data['ajax_function'] = 'delete_client_note';
+			data['note_id'] = note_id;
+			if(what == true){
+				$.ajax({
+					url:'clients.php',
+					type:'POST',
+					data: data,
+					success: function(){
+						$('#c_note_' + note_id).remove();
+					}
+				});
+			}
+		});
+
 
 		$(".generateguid").fancybox({maxWidth:350});
 
@@ -861,6 +925,26 @@
  				});
 	 		}
 		});
+
+		$('#name').keyup(function(){
+ 			$.ajax({
+ 				url:'clients.php',
+ 				type: "POST",
+ 				data:{doingajax:"true", ajax_function: "check_clientname", clientname:$(this).val()},
+ 				success:function(response){
+ 					//replace the data
+						console.log(response);
+						if(response > 0){
+							$("#fa_clientname").removeClass("fa-check").addClass("fa-close").css("color", "red");
+							$(".save_add_client").attr("disabled","disabled").attr("title", "Client Name in Use");
+						}else{
+							$("#fa_clientname").removeClass("fa-close").addClass("fa-check").css("color", "green");
+							$(".save_add_client").removeAttr("disabled").attr("title", "");
+						}
+	 				}
+ 			});
+		});
+
 
 		// ADD NEW CREDENTIAL TO CLIENT BUTTON
 		$('.add_edit_cred').click(function(e){

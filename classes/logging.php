@@ -34,11 +34,32 @@ class Logger{
 	public function read(){
 
 	}
+
+	//log employee actions
+	public function logEmployeeEdit(){
+
+	}
+	public function logEmployeeAdd(){
+
+	}
+
+	//log client actions
+	public function logClientEdit(){
+
+	}
+	public function logClientAdd(){
+
+	}
+	public function logCredentialAdd(){
+
+	}
+
+
 	public function logCredentialEdit($credential_id, $new_values){
 		$db = new db();
 
 		if($credential_id):
-
+			//get the original values
 			$sql = 'SELECT * from credential WHERE id = ?';
 			$original_values = $db->fetch($sql, $credential_id);
 
@@ -48,9 +69,6 @@ class Logger{
 			//now lets log this to the database
 			$sql = "INSERT INTO access_log (user_id, timestamp, credential_id, old_value, new_value, type) values (?,?,?,?,?,?)";
 			$insert_id = $db->insert($sql, $_SESSION['session']->user->id, date('Y-m-d H:i:s'), $credential_id, $original_values, $new_values, "credential_edit");
-
-
-
 
 			if($insert_id):
 				return $insert_id;

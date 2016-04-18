@@ -12,7 +12,7 @@
 	<li role="presentation" <?php echo $script_name == "clients.php" ? 'class="active"' : ""  ?>>
 		<?php
 			/* check if master admin */
-			if($_SESSION['session']->user->isMasterAdmin):
+			if($_SESSION['session']->user->isMasterAdmin || $_SESSION['session']->user->isAdmin):
 				$sql = 'SELECT count(*) as count FROM clients';
 			else:
 				$sql = 'SELECT count(*) as count FROM employee_access ea LEFT JOIN clients cl ON cl.id = ea.client_id WHERE ea.employee_id = "' . $_SESSION['session']->user->id . '" AND ea.client_id != "";';
@@ -21,26 +21,36 @@
 		?>
 		<a href="clients.php">Clients  <span class="badge"><?php echo $count->count; ?> </span></a> 
 	</li>
+	<?php if($_SESSION['session']->user->isAdmin): ?>
+	<li role="presentation" <?php echo $script_name == "logs.php" ? 'class="active"' : ""  ?>>
+		<a href="logs.php">Logs</a>
+	</li>
+<?php endif; ?>
 	<li role="presentation">
-		<a class="nav-container" data-toggle="collapse" href="#toolsNav">Tools<span class="caret-container"><span class="caret arrow"></span></span></a>
-
 		<?php 
 
 			$navactive = false;
 			$toolarray = array(
 				'tool_passgen.php',
 				'tool_plugin.php',
+				'tool_serialize.php',
+				'tool_IP.php',
+				'tool_pagespeed',
 				);
 			if(in_array($script_name, $toolarray)){
 				$navactive = true;
 			}
 		 ?>		
+		<a class="nav-container" data-toggle="collapse" href="#toolsNav">Tools <span class="badge"><?php echo count($toolarray); ?> </span> <span class="caret-container"><span class="caret arrow"></span></span></a>
+
 
 
           <ul class="nav nav-pills nav-stacked collapse <?php echo $navactive ? 'in' : ""  ?>" id="toolsNav">
             <li <?php echo $script_name == "tool_plugin.php" ? 'class="active"' : ""  ?>><a href="tool_plugin.php">Wordpress Password Control Plugin</a></li>
             <li <?php echo $script_name == "tool_passgen.php" ? 'class="active"' : ""  ?>><a href="tool_passgen.php">Strong Password Generator</a></li>
-            <li><a href="#">Serialize/Unserialize</a></li>
+            <li <?php echo $script_name == "tool_serialize.php" ? 'class="active"' : ""  ?>><a href="tool_serialize.php">Serialize/Unserialize</a></li>
+            <li <?php echo $script_name == "tool_IP.php" ? 'class="active"' : ""  ?>><a href="tool_IP.php">IP Address Assignment</a></li>
+            <li <?php echo $script_name == "tool_pagespeed.php" ? 'class="active"' : ""  ?>><a href="tool_pagespeed.php">Google PageSpeed</a></li>
             <li class="nav-divider"></li>
           </ul>
 	</li>

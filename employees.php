@@ -22,7 +22,7 @@ $v = 99999; //high number here so we never actually hit it
 		<div class='panel-title'>Employee's</div>
 	</div>
 	<div class="panel-body">
-		You currently have admin access<br /><br />
+		<!-- You currently have admin access<br /><br /> -->
 		<div class="msgholder">
 		</div>
 		<button class="btn btn-primary" id="btnAddNew" href="#addnew">Add New Employee</button>
@@ -165,6 +165,7 @@ $v = 99999; //high number here so we never actually hit it
 		<thead>
 			<tr>
 				<td>Employee ID</td>
+				<td>Access Level</td>
 				<td>Name</td>
 				<td>Username</td>
 				<td>Phone Number</td>
@@ -178,6 +179,21 @@ $v = 99999; //high number here so we never actually hit it
 				?>
 				<tr>
 					<td><?php echo $user->id ?></td>
+					<td>
+					<?php 
+						switch($user->access_level){
+							case "4":
+								echo "Employee";
+								break;
+							case "5":
+								echo "Admin";
+								break;
+							case "6":
+								echo "Super Admin";
+								break;
+						}
+					?>
+					</td>
 					<td><?php echo ucwords($user->lname . ", " .$user->fname); ?></td>
 					<td><?php echo $user->username ?></td>
 					<td><?php echo $user->phone; ?></td>

